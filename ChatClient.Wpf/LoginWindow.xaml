@@ -1,0 +1,61 @@
+<Window x:Class="ChatClientWpf.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Chat Room - Đăng nhập" Width="380" Height="430"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Chat Room" FontSize="26" FontWeight="SemiBold"
+                   Foreground="{StaticResource AccentBrush}" Margin="0,0,0,18"/>
+
+        <Grid Grid.Row="1" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Địa chỉ server" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+                <TextBox x:Name="HostBox" Text="127.0.0.1" Padding="6"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Cổng" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+                <TextBox x:Name="PortBox" Text="5000" Padding="6"/>
+            </StackPanel>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Margin="0,0,0,12">
+            <TextBlock Text="Tên đăng nhập" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+            <TextBox x:Name="UserBox" Padding="6"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Margin="0,0,0,18">
+            <TextBlock Text="Mật khẩu" Foreground="{StaticResource MutedBrush}" Margin="0,0,0,4"/>
+            <PasswordBox x:Name="PassBox" Padding="6"/>
+        </StackPanel>
+
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="LoginButton" Grid.Column="0" Content="Đăng nhập" Padding="0,9"
+                    Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"
+                    IsDefault="True" Click="LoginButton_Click"/>
+            <Button x:Name="RegisterButton" Grid.Column="2" Content="Đăng ký" Padding="0,9"
+                    Click="RegisterButton_Click"/>
+        </Grid>
+
+        <TextBlock x:Name="StatusText" Grid.Row="5" Margin="0,16,0,0" TextWrapping="Wrap"
+                   Foreground="{StaticResource MutedBrush}"/>
+    </Grid>
+</Window>

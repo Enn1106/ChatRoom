@@ -1,0 +1,134 @@
+<Window x:Class="ChatClientWpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ChatClientWpf"
+        Title="Chat Room" Width="1000" Height="660" MinWidth="720" MinHeight="460"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <!-- Cách hiển thị một dòng chat: bong bóng, lệch phải nếu là của mình -->
+        <DataTemplate DataType="{x:Type local:ChatLine}">
+            <StackPanel Margin="0,5" MaxWidth="560" HorizontalAlignment="{Binding Align}">
+                <TextBlock Text="{Binding Header}" Visibility="{Binding HeaderVisibility}"
+                           FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}"
+                           HorizontalAlignment="{Binding Align}" Margin="2,0,2,3"/>
+                <Border Background="{Binding Bubble}" CornerRadius="12" Padding="12,8"
+                        HorizontalAlignment="{Binding Align}">
+                    <TextBlock Text="{Binding Text}" Foreground="{Binding TextBrush}"
+                               FontSize="{Binding FontSizeValue}" TextWrapping="Wrap"/>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Cách hiển thị một người trong danh sách online -->
+        <DataTemplate DataType="{x:Type local:UserItem}">
+            <DockPanel Margin="2,4">
+                <Ellipse DockPanel.Dock="Left" Width="8" Height="8" Fill="#15803D"
+                         Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <Border DockPanel.Dock="Right" Background="{Binding BadgeBackground}" CornerRadius="4"
+                        Padding="6,1" Visibility="{Binding BadgeVisibility}" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding RoleText}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{Binding BadgeForeground}"/>
+                </Border>
+                <TextBlock Text="{Binding Name}" FontSize="14" VerticalAlignment="Center"/>
+            </DockPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Cột trái: phòng và người online -->
+        <Grid Grid.Column="0" Background="{StaticResource PanelBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <DockPanel Grid.Row="0" Margin="16,16,16,6">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button x:Name="CreateRoomButton" Content="+" Width="28" Height="28" FontSize="16"
+                            ToolTip="Tạo phòng mới (chỉ admin)" Click="CreateRoomButton_Click"/>
+                    <Button x:Name="DeleteRoomButton" Content="×" Width="28" Height="28" FontSize="16" Margin="6,0,0,0"
+                            ToolTip="Xóa phòng đang chọn (chỉ admin)" Click="DeleteRoomButton_Click"/>
+                </StackPanel>
+                <TextBlock Text="PHÒNG CHAT" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <ListBox x:Name="RoomList" Grid.Row="1" Margin="10,0" BorderThickness="0" Background="Transparent"
+                     SelectionChanged="RoomList_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock FontSize="14" Padding="4,4">
+                            <Run Text="# "/><Run Text="{Binding Mode=OneWay}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock x:Name="OnlineHeader" Grid.Row="2" Text="ĐANG ONLINE TRONG PHÒNG" FontSize="12"
+                       FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" Margin="16,12,16,6"/>
+
+            <ListBox x:Name="UserList" Grid.Row="3" Margin="10,0" BorderThickness="0" Background="Transparent"
+                     PreviewMouseRightButtonDown="UserList_PreviewMouseRightButtonDown">
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem x:Name="KickItem" Header="Kick" Click="Kick_Click"/>
+                        <MenuItem x:Name="MuteItem" Header="Mute 5 phút" Click="Mute_Click"/>
+                        <MenuItem x:Name="UnmuteItem" Header="Bỏ mute" Click="Unmute_Click"/>
+                        <Separator x:Name="AdminSeparator"/>
+                        <MenuItem x:Name="BanItem" Header="Ban tài khoản (admin)" Click="Ban_Click"/>
+                        <MenuItem x:Name="UnbanItem" Header="Mở khóa tài khoản... (admin)" Click="Unban_Click"/>
+                        <MenuItem x:Name="PromoteItem" Header="Đặt làm moderator (admin)" Click="Promote_Click"/>
+                        <MenuItem x:Name="DemoteItem" Header="Hạ về user (admin)" Click="Demote_Click"/>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
+
+            <TextBlock x:Name="ConnectionText" Grid.Row="4" Margin="16,10,16,14" FontSize="12"
+                       Foreground="{StaticResource MutedBrush}" Text="Đã kết nối"/>
+        </Grid>
+
+        <!-- Cột phải: khung chat -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <DockPanel Grid.Row="0" Margin="24,14">
+                <Button DockPanel.Dock="Right" Content="Đăng xuất" Padding="14,6" VerticalAlignment="Center"
+                        Click="LogoutButton_Click"/>
+                <StackPanel>
+                    <TextBlock x:Name="RoomTitle" Text="# Chung" FontSize="18" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="RoomSubtitle" FontSize="12" Foreground="{StaticResource MutedBrush}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <ScrollViewer x:Name="MessageScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                          BorderThickness="0" Padding="24,6">
+                <ItemsControl x:Name="MessageList"/>
+            </ScrollViewer>
+
+            <Grid Grid.Row="2" Background="{StaticResource PanelBrush}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="InputBox" Grid.Column="0" Margin="24,14,12,14" Padding="10,9" FontSize="14"
+                         MaxLength="1000" KeyDown="InputBox_KeyDown"/>
+                <Button Grid.Column="1" Content="Gửi" Margin="0,14,24,14" Padding="22,9"
+                        Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"
+                        FontWeight="SemiBold" Click="SendButton_Click"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
